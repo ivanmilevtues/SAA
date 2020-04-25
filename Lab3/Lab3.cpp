@@ -1,5 +1,9 @@
 #include <iostream>
-
+/*
+ * Синтез и анализ на алгоритми
+ * Ивай Ивайлов Милев Група 52 ФК№121218022
+ * Упражение №3. Рекурсия.
+ */
 using namespace std;
 
 string reverse(string input);
@@ -75,27 +79,27 @@ bool exists_in_number(int number, int number_to_check) {
 	return exists_in_number(number / 10, number_to_check);
 }
 
-int main()
-{
-	double arr[4][4] = {
-		{1, 6, 2, 4},
-		{5, 1, 3, 5},
-		{2, 3, 1, 6},
-		{4, 1, 6, 1},
-	};
-
-	cout << "Exercise 21 output:" << number_of_duos_in_matrix(arr) << endl;
-
-	cout << "Exercise 24 output: 9 in binary = " << convert_to_double(9, "") << " | -42 in binary = " << convert_to_double(-42, "") << endl;
-
-	cout << "Exercise 25 output: 2 ^ 7 = " << power(2, 7) << " | 3 ^ -3 = " << power(3., -3) << endl;
-
-	int arr1d[10] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-	cout << "Exercise 27 output: sum of {1, 2, 3, 4, 5, 6, 7, 8, 9} = " << sum_of_array(arr1d, 10) << endl;
-
-	cout << "Exercise 28 output: 7 in 27 " << exists_in_number(27, 7) << " | 8 in 8209 " << exists_in_number(8209, 8) << " | 9 in -73973 " << exists_in_number(-73973, 9) <<
-		" | 2 in 10543 " << exists_in_number(10543, 2) << endl;
-}
+//int main()
+//{
+//	double arr[4][4] = {
+//		{1, 6, 2, 4},
+//		{5, 1, 3, 5},
+//		{2, 3, 1, 6},
+//		{4, 1, 6, 1},
+//	};
+//
+//	cout << "Exercise 21 output:" << number_of_duos_in_matrix(arr) << endl;
+//
+//	cout << "Exercise 24 output: 9 in binary = " << convert_to_double(9, "") << " | -42 in binary = " << convert_to_double(-42, "") << endl;
+//
+//	cout << "Exercise 25 output: 2 ^ 7 = " << power(2, 7) << " | 3 ^ -3 = " << power(3., -3) << endl;
+//
+//	int arr1d[10] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+//	cout << "Exercise 27 output: sum of {1, 2, 3, 4, 5, 6, 7, 8, 9} = " << sum_of_array(arr1d, 10) << endl;
+//
+//	cout << "Exercise 28 output: 7 in 27 " << exists_in_number(27, 7) << " | 8 in 8209 " << exists_in_number(8209, 8) << " | 9 in -73973 " << exists_in_number(-73973, 9) <<
+//		" | 2 in 10543 " << exists_in_number(10543, 2) << endl;
+//}
 
 string reverse(string input) {
 	string rev;
