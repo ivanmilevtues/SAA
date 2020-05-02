@@ -1,5 +1,9 @@
 #include <iostream>
 #include <assert.h>
+#include <ctime>
+#include <chrono> 
+#include <sstream>
+#include <fstream>
 
 using namespace std;
 
@@ -24,7 +28,9 @@ bool check_if_palindrome(string word) {
 }
 
 // Sorting algorithms:
-void time_algorithms();
+void generate_arr(int* arr, const int size);
+long evaluate_algorithm(void (*algo)(int*, int), int * arr, int size, string algorithm_name);
+void time_algorithms(const int size);
 void bubble_sort(int* arr, int size);
 void insertion_sort(int* arr, int size);
 void selection_sort(int* arr, int size);
@@ -37,7 +43,7 @@ void print_arr(int* arr, int size);
 int main() {
 	change(125, 0);
 
-	time_algorithms();
+	time_algorithms(10000);
 
 	// task 48.
 	assert(check_if_palindrome("sos") == true);
@@ -47,24 +53,78 @@ int main() {
 }
 
 
-// Exersize 46.
-void time_algorithms() {
-	int arr[5] = { 5, 3, 2, 1, 4 };
-	
-	insertion_sort(arr, 5);
-	print_arr(arr, 5);
-	
-	selection_sort(arr, 5);
-	print_arr(arr, 5);
-	
-	quick_sort(arr, 5);
-	print_arr(arr, 5);
-	
-	shell_sort(arr, 5);
-	print_arr(arr, 5);
+void generate_arr(int* arr, const int size) {
+	for (int i = 0; i < size; i++) {
+		arr[i] = rand() % size;
+	}
+}
 
-	heap_sort(arr, 5);
-	print_arr(arr, 5);
+void generate_arr_semi_sorted(int* arr, const int size) {
+	int chunk = size / 1000;
+	int old_i = 0;
+	for (int i = chunk; i <= size; i += chunk) {
+		for (int k = old_i; k < i; k++) {
+			arr[k] = rand() % chunk + old_i;
+		}
+		old_i = i;
+	}
+}
+
+long evaluate_algorithm(void (*algo)(int*, int), int* arr, int size, string algorithm_name) {
+	int* arr_cpy = new int[size];
+	memcpy(arr_cpy, arr, size);
+	
+	// time the algorithm
+	auto start = chrono::high_resolution_clock::now();
+	(*algo)(arr, size);
+	auto stop = chrono::high_resolution_clock::now();
+	auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+	
+	cout << "Time for " << algorithm_name << " and size: " << size  <<  ", " << duration.count() << " microsecs" << endl;
+	return duration.count();
+	delete [] arr_cpy;
+}
+
+// Exersize 46.
+void time_algorithms(const int size) {
+	stringstream xlsFormatResult;
+	char delimiter = '\t'; 
+	// Add headers
+	xlsFormatResult << "Size" << delimiter
+		<< "Bubble sort time in microseconds"<< delimiter
+		<< "Insertion sort time in microseconds" << delimiter
+		<< "Selection sort time in microseconds" << delimiter
+		<< "Quick sort time in microseconds" << delimiter
+		<< "Shell sort time in microseconds"<< delimiter
+		<< "Heap sort time in microseconds"<< delimiter
+		<< "Merge sort time in microseconds" << endl; 
+
+	for (int size = 10000; size <= 200000; size+= 10000) {
+		int* base_arr = new int[size];
+		generate_arr_semi_sorted(base_arr, size);
+		// generate_arr(base_arr, size);
+		long bubble_sort_time = evaluate_algorithm(bubble_sort, base_arr, size, "Bubble sort");
+		long insertion_sort_time = evaluate_algorithm(insertion_sort, base_arr, size, "Insertion sort");
+		long selection_sort_time = evaluate_algorithm(selection_sort, base_arr, size, "Selection sort");
+		long quick_sort_time = evaluate_algorithm(quick_sort, base_arr, size, "Quick sort");
+		long shell_sort_time = evaluate_algorithm(shell_sort, base_arr, size, "Shell sort");
+		long heap_sort_time = evaluate_algorithm(heap_sort, base_arr, size, "Heap sort");
+		long merge_sort_time = evaluate_algorithm(merge_sort, base_arr, size, "Merge sort");
+		xlsFormatResult << size << delimiter
+			<< bubble_sort_time << delimiter
+			<< insertion_sort_time << delimiter
+			<< selection_sort_time << delimiter
+			<< quick_sort_time << delimiter
+			<< shell_sort_time << delimiter
+			<< heap_sort_time << delimiter
+			<< merge_sort_time << endl;
+		delete[] base_arr;
+	}
+
+	ofstream resultsFile;
+	resultsFile.open("AlgorithmsEvaluationSemiSorted.xls");
+	resultsFile << xlsFormatResult.str();
+	resultsFile.close();
 }
 
 void bubble_sort(int* arr, int size) {
@@ -92,7 +152,6 @@ void insertion_sort(int* arr, int size) {
 		arr[j] = index;
 	}
 }
-
 
 void selection_sort(int* arr, int size) {
 	int min, min_indx;
@@ -181,6 +240,7 @@ void sift_down(int* arr, int root, int size) {
 			temp = arr[root];
 			arr[root] = arr[max_child];
 			arr[max_child] = temp;
+			root = max_child;
 		}
 		else {
 			done = true;
@@ -201,30 +261,55 @@ void heap_sort(int* arr, int size) {
 	}
 }
 
-/// TODO: FINISH ME 
-void merge(int* arr, int left, int mid, int right) {
+void merge(int * temp, int* arr, int left, int mid, int right) {
 	int i, left_end = mid - 1, num_elements = right - left + 1, tmp_pos = left;
 	while (left <= left_end && mid <= right) {
 		if (arr[left] <= arr[mid]) {
+			temp[tmp_pos] = arr[left];
+			tmp_pos++;
+			left++;
 		}
+		else {
+			temp[tmp_pos] = arr[mid];
+			tmp_pos++;
+			mid++;
+		}
+	}
+
+	while (left <= left_end) {
+		temp[tmp_pos] = arr[left];
+		left++;
+		tmp_pos++;
+	}
+
+	while (mid <= right) {
+		temp[tmp_pos] = arr[mid];
+		mid++;
+		tmp_pos++;
+	}
+
+	for (i = 0; i <= num_elements; i++) {
+		arr[right] = temp[right];
+		right--;
 	}
 }
 
-void m_sort(int* arr, int left, int right) {
+void m_sort(int * temp, int* arr, int left, int right) {
 	int mid;
 	if (right > left) {
 		mid = (right + left) / 2;
-		m_sort(arr, left, mid);
-		m_sort(arr, mid + 1, right);
-		merge(arr, left, mid + 1, right);
+		m_sort(temp, arr, left, mid);
+		m_sort(temp, arr, mid + 1, right);
+		merge(temp, arr, left, mid + 1, right);
 	}
 }
 
 void merge_sort(int* arr, int size) {
+	int * temp = new int[size];
 	int left = 0, right = size - 1;
-	m_sort(arr, left, right);
+	m_sort(temp, arr, left, right);
+	delete[] temp;
 }
-
 
 void print_arr(int* arr, int size) {
 	for (int i = 0; i < size; i++) {
