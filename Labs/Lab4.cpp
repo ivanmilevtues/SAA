@@ -40,7 +40,7 @@ void heap_sort(int* arr, int size);
 void merge_sort(int* arr, int size);
 void print_arr(int* arr, int size);
 
-int main() {
+int t_main() {
 	change(125, 0);
 
 	time_algorithms(10000);
